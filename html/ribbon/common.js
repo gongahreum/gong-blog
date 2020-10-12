@@ -8,7 +8,7 @@ function init() {
 		var _init = function() {
 
 			canvas[0].width = $(window).width();
-			canvasStep1[0].height = window.outerHeight;
+			canvas[0].height = window.outerHeight;
 			_drawPath();
 		}
 
