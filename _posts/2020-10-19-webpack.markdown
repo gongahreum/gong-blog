@@ -1,0 +1,112 @@
+---
+title: 웹팩(webpack)
+layout: post
+date: '2020-10-19 14:00:31 +0900'
+categories: []
+---
+
+**웹팩**은 프로젝트의 구조를 분석하고 자바스크립트 모듈을 비롯한 관련 리소스들을 찾은 다음 이를 브라우저에서 이용할 수 있는 번들로 묶고 패킹하는 **모듈 번들러(Module bundler)**다.
+
+![](/assets/webpack_bundle.png)
+
+
+**번들링** : 여러개의 파일 중에 종속성이 존재하는 파일을 하나의 파일로 묶어 패키징을 시키는 과정
+
+**번들러의 장점**
+1. 여러 파일의 자바스크립트 코드를 압축하여 최적화 할 수 있기 때문에 로딩에 대한 네트워크 비용을 줄일 수 있다.
+2. 모듈 단위로 개발이 가능하여, 가독성과 유지보수가 쉽다.
+3. 최신 자바스크립트 문법을 지원하지 않는 브라우저에서 사용할 수 있는 코드로 쉽게 변환시켜 준다.
+
+**Babel 이란 ?**
+최신 ES6버전을 구 버전인 ES5로 변환해준다.
+아직 구 버전을 사용하는 브라우저(ex.IE11)를 위해 Babel을 사용하여 ES5버전으로 바꿔주어야 한다.
+
+
+웹팩은 Entry, Output, Loaders, Plugins, Mode로 구성되어 있으며, 각각의 역할은 다음과 같다.  
+
+
+**Entry**  
+entry는 웹팩이 빌드할 파일의 시작 위치를 나타냅니다.  
+entry 지점으로부터 import되어 있는 다른 모듈과 라이브러리에 대한 의존성을 찾습니다.  
+entry의 디폴트로 설정된 값은 ./src/index.js 입니다.
+```
+module.exports = {
+  entry: ' ./src/index.js'
+};
+```
+
+
+**Output**  
+output은 웹팩에 의해 생성되는 번들을 내보낼 위치와 파일의 이름을 지정합니다.  
+output의 기본값은 ./dist/main.js 입니다.
+```
+const path = require('path');
+
+module.exports = {
+  entry: './path/to/my/entry/file.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'main.js'
+  }
+};
+```
+
+
+**Loaders**  
+loaders를 통해 자바스크립트 파일이 아닌 파일들도 유효한 모듈로 변환시켜줍니다.  
+loaders의 설정은 싱글 모듈에 대한 rules 프로퍼티를 정의해야 하며, rules 프로퍼티는 test와 use를 필수 프로퍼티로 가지고 있습니다.  
+test 프로퍼티는 변환해야하는 파일 또는 파일들을 식별하는 역할을 합니다.  
+use 프로퍼티는 변환되어야 하는 파일에 대하여 어떤 로더를 사용해야하는지 설정합니다.
+```
+const path = require('path');
+
+module.exports = {
+  output: {
+    filename: 'my-first-webpack.bundle.js'
+  },
+  module: {
+    rules: [
+      { test: /\.txt$/, use: 'raw-loader' }
+    ]
+  }
+};
+```
+
+
+**Plugins**  
+로더가 파일단위로 처리하는 반면 플러그인은 번들된 결과물을 처리합니다.  
+번들된 자바스크립트를 난독화 한다거나 특정 텍스트를 추출하는 용도로 사용할 수 있습니다.
+```
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack'); //to access built-in plugins
+
+module.exports = {
+  module: {
+    rules: [
+      { test: /\.txt$/, use: 'raw-loader' }
+    ]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({template: './src/index.html'})
+  ]
+};
+```
+
+
+**Mode**  
+mode는 웹팩을 세팅함에 있어서 development, production, none 중 하나를 파라미터로 사용합니다.  
+“production”은 최적화되어 빌드되어집니다.  
+“development”는 빠르게 빌드됩니다.  
+“none”은 아무 기능 없이 웹팩으로 빌드됩니다.
+```
+module.exports = {
+  mode: 'production'
+};
+```
+
+
+## 자주 사용하는 플러그인
+**BannerPlugin** 번들링된 결과물 상단에 빌드 정보를 추가한다.
+**HtmlWebpackPlugin** HTML파일을 빌드 과정에 추가할 수 있어서 동적으로 생성되는 Javascript와 CSS, 빌드 타임에 결정되는 값을 템플릿 파일에 넣어서 HTML 파일을 동적으로 만들어준다.
+**CleanWebpackPlugin** 빌드할 때마다 output 폴더(/dist)를 삭제해준다.
+**MniCssExtractPlugin** 번들된 자바스크립트 코드에서 CSS 파일만 따로 추출해서 CSS파일을 만들어준다.
